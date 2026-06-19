@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feliz Día del Padre</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#081a0b;font-family:'Lato',sans-serif;overflow:hidden;
+}
+.scene{width:100%;height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+
+.particle{position:absolute;border-radius:50%;animation:floatUp linear infinite;pointer-events:none;}
+@keyframes floatUp{0%{transform:translateY(110vh);opacity:0;}10%{opacity:0.18;}90%{opacity:0.08;}100%{transform:translateY(-10vh);opacity:0;}}
+@keyframes sway{0%,100%{transform:rotate(-12deg) translateY(0);}50%{transform:rotate(12deg) translateY(-18px);}}
+
+.envelope-wrap{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  z-index:20;
+  transition:opacity 0.5s ease, transform 0.5s ease;
+}
+.envelope-wrap.hidden{
+  opacity:0;
+  transform:scale(0.85);
+  pointer-events:none;
+}
+.envelope{
+  width:320px;height:220px;
+  position:relative;
+  transition:transform 0.3s;
+  filter:drop-shadow(0 20px 60px rgba(0,0,0,0.7));
+}
+.envelope:hover{transform:scale(1.04);}
+.envelope.opening{pointer-events:none;}
+
+.env-body{
+  position:absolute;bottom:0;left:0;right:0;
+  height:180px;
+  background:#e8f4ea;
+  border-radius:4px 4px 10px 10px;
+  overflow:hidden;
+}
+.env-body::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;top:0;
+  background:linear-gradient(160deg,#d0ebd5 0%,#e8f4ea 60%);
+}
+.env-left{
+  position:absolute;bottom:0;left:0;
+  width:0;height:0;
+  border-style:solid;
+  border-width:180px 160px 0 0;
+  border-color:#b8dfc0 transparent transparent transparent;
+  z-index:2;
+}
+.env-right{
+  position:absolute;bottom:0;right:0;
+  width:0;height:0;
+  border-style:solid;
+  border-width:180px 0 0 160px;
+  border-color:#b8dfc0 transparent transparent transparent;
+  z-index:2;
+}
+.env-bottom{
+  position:absolute;bottom:0;left:0;right:0;
+  width:0;height:0;
+  margin:auto;
+  border-style:solid;
+  border-width:0 160px 100px 160px;
+  border-color:transparent transparent #c8e8cc transparent;
+  z-index:3;
+}
+
+.env-flap{
+  position:absolute;top:0;left:0;right:0;
+  width:0;height:0;
+  margin:auto;
+  border-style:solid;
+  border-width:110px 160px 0 160px;
+  border-color:#3a8a50 transparent transparent transparent;
+  transform-origin:top center;
+  transition:transform 0.8s cubic-bezier(.4,0,.2,1);
+  z-index:10;
+}
+.env-flap.open{
+  transform:rotateX(180deg);
+}
+
+.env-stamp{
+  position:absolute;top:18px;right:28px;
+  width:36px;height:44px;
+  background:#1a3a20;
+  border:2px solid #7defa0;
+  border-radius:3px;
+  z-index:11;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.env-stamp::after{
+  content:'';position:absolute;inset:-5px;
+  border:1px dashed rgba(125,239,160,0.4);
+  border-radius:4px;
+}
+
+.env-heart{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:5;
+  animation:heartbeat 1.5s ease-in-out infinite;
+}
+@keyframes heartbeat{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.15);}}
+
+.hint{
+  position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);
+  color:rgba(125,239,160,0.7);
+  font-size:13px;font-weight:300;letter-spacing:0.1em;
+  white-space:nowrap;
+  animation:hintPulse 2s ease-in-out infinite;
+}
+@keyframes hintPulse{0%,100%{opacity:0.5;}50%{opacity:1;}}
+
+.card-wrap{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.85);
+  width:380px;
+  max-height:88vh;
+  overflow-y:auto;
+  z-index:8;
+  transition:transform 0.9s cubic-bezier(.22,1,.36,1), opacity 0.6s;
+  opacity:0;
+  pointer-events:none;
+}
+.card-wrap.revealed{
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1;
+  pointer-events:auto;
+}
+
+.card{
+  width:100%;background:#f5f9f2;border-radius:8px;overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,0.8);
+}
+
+.card-header{background:#122a18;position:relative;height:180px;overflow:hidden;}
+.bubble{position:absolute;border-radius:50%;border:1.5px solid rgba(100,230,140,0.45);animation:bubbleRise ease-in infinite;}
+@keyframes bubbleRise{0%{transform:translateY(0);opacity:0.7;}100%{transform:translateY(-220px);opacity:0;}}
+.formula{position:absolute;font-family:monospace;color:rgba(125,239,160,0.45);animation:glowPulse 3.5s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.mol-spin{animation:molSpin 14s linear infinite;transform-origin:45px 45px;}
+@keyframes molSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.orb{animation:orbAnim 3.5s linear infinite;transform-origin:30px 30px;}
+@keyframes orbAnim{from{transform:rotate(0deg) translateX(20px);}to{transform:rotate(360deg) translateX(20px);}}
+.header-content{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 1.8rem 1rem;z-index:3;}
+.badge{display:inline-block;background:rgba(100,220,130,0.18);border:1px solid rgba(100,220,130,0.4);color:#7defa0;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:8px;}
+.headline{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:#fff;line-height:1.1;}
+.headline em{font-style:italic;color:#7defa0;}
+
+.card-body{padding:1.2rem 1.6rem 0.8rem;}
+.section-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#3a8a50;margin-bottom:10px;}
+.message-block{display:flex;flex-direction:column;gap:12px;}
+.msg-item{display:flex;gap:10px;align-items:flex-start;}
+.msg-num{
+  min-width:22px;height:22px;
+  background:#1a3a20;color:#7defa0;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;
+  flex-shrink:0;margin-top:2px;
+}
+.msg-text{font-size:12.5px;font-weight:300;color:#1e3a22;line-height:1.75;font-style:italic;}
+
+.divider{margin:0.8rem 1.6rem;height:1px;background:linear-gradient(90deg,transparent,#b8dfc0,transparent);}
+
+.sig-block{display:flex;justify-content:space-between;align-items:flex-end;padding:0.7rem 1.6rem 1.2rem;}
+.sig-label{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7a9e7e;margin-bottom:2px;}
+.sig-name{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:#122a18;}
+.card-bar{height:5px;background:linear-gradient(90deg,#122a18,#3a8a50,#7defa0,#3a8a50,#122a18);background-size:300% 100%;animation:barShimmer 4s linear infinite;}
+@keyframes barShimmer{0%{background-position:0%;}100%{background-position:300%;}}
+
+canvas#fireworks{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:100;
+}
+
+.btn-reset{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(125,239,160,0.15);
+  border:1px solid rgba(125,239,160,0.4);
+  color:#7defa0;
+  padding:8px 24px;border-radius:20px;
+  font-size:12px;font-weight:700;letter-spacing:0.1em;
+  cursor:pointer;opacity:0;pointer-events:none;
+  transition:opacity 0.5s;
+  z-index:30;
+}
+.btn-reset.show{opacity:1;pointer-events:auto;}
+.btn-reset:hover{background:rgba(125,239,160,0.28);}
+
+.btn-music{
+  position:absolute;top:20px;right:20px;
+  width:42px;height:42px;
+  background:rgba(125,239,160,0.15);
+  border:1px solid rgba(125,239,160,0.4);
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.5s, background 0.3s;
+  z-index:30;
+}
+.btn-music.show{opacity:1;pointer-events:auto;}
+.btn-music:hover{background:rgba(125,239,160,0.28);}
+.btn-music svg{width:18px;height:18px;}
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+
+<!-- ====================================================== -->
+<!-- 🎵 AQUÍ VA LA MÚSICA: cambia "musica.mp3" por el nombre -->
+<!-- de tu archivo. Debe estar en la MISMA CARPETA que este  -->
+<!-- archivo HTML.                                           -->
+<!-- ====================================================== -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="fireworks"></canvas>
+
+<div class="envelope-wrap" id="envelopeWrap">
+  <div class="envelope" id="envelope" onclick="openEnvelope()">
+
+    <div class="env-body">
+      <div class="env-left"></div>
+      <div class="env-right"></div>
+      <div class="env-bottom"></div>
+    </div>
+
+    <div class="env-flap" id="envFlap"></div>
+
+    <div class="env-stamp" style="z-index:12;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7defa0" stroke-width="2" stroke-linecap="round">
+        <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/>
+      </svg>
+    </div>
+
+    <div class="env-heart">
+      <svg width="44" height="40" viewBox="0 0 44 40" fill="none">
+        <path d="M22 36 C22 36 2 22 2 11 C2 5.5 6.5 2 11 2 C15 2 19 5 22 9 C25 5 29 2 33 2 C37.5 2 42 5.5 42 11 C42 22 22 36 22 36Z" fill="#3a8a50" stroke="#7defa0" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <div class="hint" id="hint">✦ Toca para abrir ✦</div>
+  </div>
+</div>
+
+<div class="card-wrap" id="cardWrap">
+  <div class="card">
+    <div class="card-header">
+      <div class="bubble" style="width:6px;height:6px;left:10%;bottom:-6px;animation-duration:2.4s;animation-delay:0s;"></div>
+      <div class="bubble" style="width:4px;height:4px;left:28%;bottom:-4px;animation-duration:1.9s;animation-delay:0.3s;"></div>
+      <div class="bubble" style="width:8px;height:8px;left:48%;bottom:-8px;animation-duration:2.8s;animation-delay:0.1s;"></div>
+      <div class="bubble" style="width:5px;height:5px;left:66%;bottom:-5px;animation-duration:2.2s;animation-delay:0.6s;"></div>
+      <div class="bubble" style="width:7px;height:7px;left:80%;bottom:-7px;animation-duration:2.6s;animation-delay:0.9s;"></div>
+
+      <div class="formula" style="top:10px;right:14px;font-size:11px;">H₂O · CO₂ · O₃</div>
+      <div class="formula" style="top:10px;left:12px;font-size:9px;animation-delay:1.5s;">C₆H₁₂O₆ · NH₃</div>
+
+      <svg style="position:absolute;top:6px;right:10px;opacity:0.18;" width="80" height="80" viewBox="0 0 90 90">
+        <circle cx="45" cy="45" r="13" fill="#7defa0" class="mol-spin"/>
+        <circle cx="20" cy="28" r="8" fill="#5dcaa5"/>
+        <circle cx="70" cy="28" r="8" fill="#5dcaa5"/>
+        <line x1="45" y1="45" x2="20" y2="28" stroke="#7defa0" stroke-width="2.5"/>
+        <line x1="45" y1="45" x2="70" y2="28" stroke="#7defa0" stroke-width="2.5"/>
+      </svg>
+
+      <svg style="position:absolute;bottom:40px;left:12px;opacity:0.16;" width="55" height="55" viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="7" fill="#7defa0"/>
+        <ellipse cx="30" cy="30" rx="26" ry="9" fill="none" stroke="#7defa0" stroke-width="1.3"/>
+        <ellipse cx="30" cy="30" rx="26" ry="9" fill="none" stroke="#7defa0" stroke-width="1.3" transform="rotate(60 30 30)"/>
+        <ellipse cx="30" cy="30" rx="26" ry="9" fill="none" stroke="#7defa0" stroke-width="1.3" transform="rotate(120 30 30)"/>
+        <circle r="4" fill="#a0ffbe" class="orb"/>
+      </svg>
+
+      <div class="header-content">
+        <div class="badge">Con todo el amor del mundo</div>
+        <h1 class="headline">Feliz <em>Día del Padre</em></h1>
+      </div>
+    </div>
+
+    <div class="card-body" style="padding-top:1.6rem;">
+      <p class="section-label">Papá</p>
+      <div class="message-block">
+        <p class="msg-text" style="font-size:13.5px;">Gracias por cada esfuerzo silencioso, por cada consejo sincero y por cada momento en que estuviste a mi lado. Tu amor ha sido la luz que guía mis pasos y la fuerza que impulsa mis sueños.</p>
+        <p class="msg-text" style="font-size:13.5px;">Hoy solo quiero decirte que te admiro profundamente y que estoy agradecido por tenerte en mi vida.</p>
+        <p class="msg-text" style="font-size:14.5px;font-weight:700;font-style:normal;color:#1a5c28;">¡Feliz Día del Padre!</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="sig-block">
+      <div>
+        <p class="sig-name">Tu hijo</p>
+      </div>
+      <svg width="38" height="44" viewBox="0 0 40 46" fill="none">
+        <rect x="12" y="2" width="16" height="5" rx="2" fill="#122a18"/>
+        <path d="M14 7 L7 32 Q6 40 20 40 Q34 40 33 32 L26 7 Z" fill="#e4f2e8" stroke="#3a8a50" stroke-width="1.5"/>
+        <ellipse cx="20" cy="38" rx="10" ry="3" fill="#5dcaa5" opacity="0.5"/>
+        <circle cx="15" cy="30" r="2" fill="#5dcaa5" opacity="0.8">
+          <animate attributeName="cy" values="30;25;30" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="23" cy="33" r="1.5" fill="#3a8a50" opacity="0.7">
+          <animate attributeName="cy" values="33;28;33" dur="2.3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="18" cy="35" r="1" fill="#7defa0">
+          <animate attributeName="cy" values="35;31;35" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+
+    <div class="card-bar"></div>
+  </div>
+</div>
+
+<button class="btn-reset" id="btnReset" onclick="resetAll()">↩ Volver a cerrar</button>
+
+<button class="btn-music" id="btnMusic" onclick="toggleMusic()">
+  <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="#7defa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V5l12-2v13"></path>
+    <circle cx="6" cy="18" r="3"></circle>
+    <circle cx="18" cy="16" r="3"></circle>
+  </svg>
+</button>
+
+</div>
+
+<script>
+const colors = ['#3a8a50','#1d9e75','#5dcaa5','#7defa0','#639922','#97c459'];
+const scene = document.getElementById('scene');
+for (let i = 0; i < 20; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const s = 3 + Math.random() * 12;
+  p.style.cssText = `width:${s}px;height:${s}px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*10}s;opacity:0.13;`;
+  scene.appendChild(p);
+}
+for (let i = 0; i < 10; i++) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  const s = 14 + Math.random() * 18;
+  svg.setAttribute('width', s); svg.setAttribute('height', s); svg.setAttribute('viewBox', '0 0 24 22');
+  svg.style.cssText = `position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;animation:sway ${4+Math.random()*5}s ease-in-out infinite;animation-delay:${Math.random()*6}s;opacity:${0.1+Math.random()*0.15};`;
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d','M12,20 Q3,5 12,2 Q21,5 12,20 Z');
+  path.setAttribute('fill', colors[Math.floor(Math.random()*colors.length)]);
+  svg.appendChild(path);
+  scene.appendChild(svg);
+}
+
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], running = false, rafId;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function rand(a, b) { return a + Math.random() * (b - a); }
+
+const fwColors = [
+  '#7defa0','#5dcaa5','#ffd700','#ff6b6b','#a78bfa',
+  '#38bdf8','#fb923c','#f472b6','#facc15','#4ade80'
+];
+
+function explode(x, y) {
+  const count = 80 + Math.floor(Math.random() * 60);
+  const col = fwColors[Math.floor(Math.random() * fwColors.length)];
+  const col2 = fwColors[Math.floor(Math.random() * fwColors.length)];
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i + rand(-0.1, 0.1);
+    const speed = rand(2, 9);
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      alpha: 1,
+      decay: rand(0.012, 0.025),
+      size: rand(2, 5),
+      color: Math.random() > 0.5 ? col : col2,
+      trail: [],
+      gravity: rand(0.08, 0.18)
+    });
+  }
+}
+
+function launchBurst() {
+  const count = 5 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      explode(rand(W * 0.1, W * 0.9), rand(H * 0.1, H * 0.55));
+    }, i * 220);
+  }
+}
+
+function drawFireworks() {
+  ctx.fillStyle = 'rgba(8,26,11,0.18)';
+  ctx.fillRect(0, 0, W, H);
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.trail.push({x: p.x, y: p.y, alpha: p.alpha});
+    if (p.trail.length > 6) p.trail.shift();
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += p.gravity;
+    p.vx *= 0.98;
+    p.alpha -= p.decay;
+    if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+    for (let t = 0; t < p.trail.length; t++) {
+      const tr = p.trail[t];
+      ctx.beginPath();
+      ctx.arc(tr.x, tr.y, p.size * (t / p.trail.length) * 0.7, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = tr.alpha * (t / p.trail.length) * 0.4;
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  if (running || particles.length > 0) rafId = requestAnimationFrame(drawFireworks);
+  else { ctx.clearRect(0,0,W,H); }
+}
+
+function startFireworks() {
+  running = true;
+  cancelAnimationFrame(rafId);
+  drawFireworks();
+  launchBurst();
+  setTimeout(launchBurst, 800);
+  setTimeout(launchBurst, 1600);
+  setTimeout(launchBurst, 2600);
+  setTimeout(launchBurst, 3600);
+  setTimeout(() => { running = false; }, 5000);
+}
+
+let opened = false;
+let musicPlaying = false;
+
+function openEnvelope() {
+  if (opened) return;
+  opened = true;
+  const flap = document.getElementById('envFlap');
+  const hint = document.getElementById('hint');
+  const cardWrap = document.getElementById('cardWrap');
+  const btnReset = document.getElementById('btnReset');
+  const btnMusic = document.getElementById('btnMusic');
+  const envelope = document.getElementById('envelope');
+  const music = document.getElementById('bgMusic');
+
+  hint.style.opacity = '0';
+  flap.classList.add('open');
+  envelope.style.cursor = 'default';
+  envelope.style.transform = 'scale(1)';
+
+  setTimeout(() => {
+    document.getElementById('envelopeWrap').classList.add('hidden');
+    cardWrap.classList.add('revealed');
+    startFireworks();
+    setTimeout(() => { btnReset.classList.add('show'); }, 2000);
+    btnMusic.classList.add('show');
+
+    music.volume = 0.5;
+    music.play().then(() => {
+      musicPlaying = true;
+      updateMusicIcon();
+    }).catch(() => {
+      musicPlaying = false;
+      updateMusicIcon();
+    });
+  }, 700);
+}
+
+function toggleMusic() {
+  const music = document.getElementById('bgMusic');
+  if (musicPlaying) {
+    music.pause();
+    musicPlaying = false;
+  } else {
+    music.play();
+    musicPlaying = true;
+  }
+  updateMusicIcon();
+}
+
+function updateMusicIcon() {
+  const icon = document.getElementById('musicIcon');
+  if (musicPlaying) {
+    icon.innerHTML = '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>';
+    icon.setAttribute('stroke', '#7defa0');
+  } else {
+    icon.innerHTML = '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle><line x1="3" y1="3" x2="21" y2="21"></line>';
+    icon.setAttribute('stroke', '#e88');
+  }
+}
+
+function resetAll() {
+  opened = false;
+  running = false;
+  particles = [];
+  ctx.clearRect(0, 0, W, H);
+  const flap = document.getElementById('envFlap');
+  const hint = document.getElementById('hint');
+  const cardWrap = document.getElementById('cardWrap');
+  const btnReset = document.getElementById('btnReset');
+  const btnMusic = document.getElementById('btnMusic');
+  const envelope = document.getElementById('envelope');
+  const music = document.getElementById('bgMusic');
+  flap.classList.remove('open');
+  cardWrap.classList.remove('revealed');
+  btnReset.classList.remove('show');
+  btnMusic.classList.remove('show');
+  music.pause();
+  music.currentTime = 0;
+  musicPlaying = false;
+  envelope.style.cursor = 'pointer';
+  document.getElementById('envelopeWrap').classList.remove('hidden');
+  setTimeout(() => { hint.style.opacity = '1'; }, 600);
+}
+</script>
+</body>
+</html>
